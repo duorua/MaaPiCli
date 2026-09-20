@@ -1671,6 +1671,12 @@ bool Interactor::process_option(
     } break;
 
     case InterfaceData::Option::Type::Input: {
+        if (auto_accept_default) {
+            for (const auto& input_def : opt.inputs) {
+                config_opt.inputs[input_def.name] = input_def.default_;
+            }
+            break;
+        }
         std::cout << MAA_NS::utf8_to_crt(std::format("\n\n## Input option \"{}\" for \"{}\" ##\n\n", opt_display_name, task_display_name));
         if (!opt.description.empty()) {
             std::string desc_text = read_text_content(opt.description);
