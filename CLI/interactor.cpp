@@ -1320,7 +1320,7 @@ bool Interactor::add_task()
 
         std::vector<Configuration::Option> config_options;
         for (const auto& option_name : data_task.option) {
-            if (!process_option(option_name, task_display_name, config_options)) {
+            if (!process_option(option_name, task_display_name, config_options, /*auto_accept_default=*/true)) {
                 LogWarn << "Failed to process option" << VAR(data_task.name) << VAR(option_name);
                 return false;
             }

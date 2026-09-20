@@ -15,7 +15,7 @@ on:
             run-name:
                 description: Run name
                 required: false
-                default: ''
+                default: ""
                 type: string
 
 run-name: >-
