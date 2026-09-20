@@ -1886,7 +1886,26 @@ void Interactor::edit_task()
     }
 
     if (config_task.option.empty()) {
-        std::cout << "This task has no options.\n\n";
+        // 任务定义里根本没有 option,不用补
+        if (data_task_iter == config_.interface_data().task.end() || data_task_iter->option.empty()) {
+            std::cout << "This task has no options.\n\n";
+            return;
+        }
+
+        // 交互式补全
+        std::cout << "This task has no configured options yet.\n";
+        std::cout << "Configure all " << data_task_iter->option.size() << " option(s) now:\n";
+
+        std::vector<Configuration::Option> config_options;
+        for (const auto& option_name : data_task_iter->option) {
+            if (!process_option(option_name, task_display, config_options, /*auto_accept_default=*/false)) {
+                LogError << "Failed to process option" << VAR(option_name);
+                std::cout << "Failed to configure option.\n\n";
+                return;
+            }
+        }
+        config_task.option = std::move(config_options);
+        std::cout << "\nTask configured with " << config_task.option.size() << " option(s).\n\n";
         return;
     }
 
@@ -2319,6 +2338,15 @@ bool Interactor::apply_preset()
 
         Configuration::Task config_task;
         config_task.name = preset_task.name;
+
+        if (preset_task.option.empty() && !data_iter->option.empty()) {
+            std::string preset_task_display = get_display_name(data_iter->name, data_iter->label);
+            for (const auto& option_name : data_iter->option) {
+                if (!process_option(option_name, preset_task_display, config_task.option, /*auto_accept_default=*/true)) {
+                    LogWarn << "Failed to process option for preset task" << VAR(preset_task.name) << VAR(option_name);
+                }
+            }
+        }
 
         for (const auto& [opt_name, opt_value] : preset_task.option) {
             auto opt_iter = config_.interface_data().option.find(opt_name);
