@@ -1941,14 +1941,8 @@ void Interactor::edit_task()
     const size_t oi = static_cast<size_t>(*opt_index - 1);
     const std::string edited_name = config_task.option[oi].name;
 
-    // 强制交互模式：临时关掉 default_option_mode_
-    const bool saved_default_mode = default_option_mode_;
-    default_option_mode_ = false;
-
     std::vector<Configuration::Option> edited_result;
     bool ok = process_option(edited_name, task_display, edited_result, /*auto_accept_default=*/false);
-
-    default_option_mode_ = saved_default_mode;
 
     if (!ok) {
         LogError << "Failed to edit option" << VAR(edited_name);
