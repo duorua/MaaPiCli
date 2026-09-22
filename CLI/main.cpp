@@ -15,9 +15,6 @@ void request_windows_emulate_vt100()
 #if defined(_WIN32)
 #include "MaaUtils/SafeWindows.hpp"
 
-    SetConsoleCP(CP_UTF8);
-    SetConsoleOutputCP(CP_UTF8);
-
     // Enable VT processing on stdout and stdin
     auto stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
 
