@@ -11,10 +11,10 @@
     <includes refid="Types_8h" local="yes">Types.h</includes>
     <includes refid="Conf_8h" local="yes">ProjectInterface/Conf.h</includes>
     <incdepgraph>
-      <node id="12">
+      <node id="13">
         <label>ProjectInterface/Conf.h</label>
         <link refid="Conf_8h"/>
-        <childnode refid="13" relation="include">
+        <childnode refid="14" relation="include">
         </childnode>
       </node>
       <node id="1">
@@ -34,17 +34,19 @@
         </childnode>
         <childnode refid="8" relation="include">
         </childnode>
-        <childnode refid="12" relation="include">
+        <childnode refid="13" relation="include">
         </childnode>
       </node>
       <node id="8">
         <label>Types.h</label>
         <link refid="Types_8h"/>
+        <childnode refid="9" relation="include">
+        </childnode>
         <childnode refid="2" relation="include">
         </childnode>
         <childnode refid="3" relation="include">
         </childnode>
-        <childnode refid="9" relation="include">
+        <childnode refid="10" relation="include">
         </childnode>
         <childnode refid="4" relation="include">
         </childnode>
@@ -52,29 +54,32 @@
         </childnode>
         <childnode refid="7" relation="include">
         </childnode>
-        <childnode refid="10" relation="include">
-        </childnode>
         <childnode refid="11" relation="include">
         </childnode>
         <childnode refid="12" relation="include">
         </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
       </node>
-      <node id="11">
+      <node id="12">
         <label>MaaFramework/MaaDef.h</label>
       </node>
-      <node id="13">
+      <node id="14">
         <label>MaaUtils/Conf.h</label>
+      </node>
+      <node id="9">
+        <label>array</label>
       </node>
       <node id="2">
         <label>filesystem</label>
       </node>
-      <node id="10">
+      <node id="11">
         <label>meojson/json.hpp</label>
       </node>
       <node id="3">
         <label>optional</label>
       </node>
-      <node id="9">
+      <node id="10">
         <label>string</label>
       </node>
       <node id="4">
@@ -130,7 +135,7 @@
 <codeline lineno="30" refid="classMaaPiCli_1_1ProjectInterfaceNS_1_1Parser_1af516bf5275f379cc415286b9a567f022" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/>std::optional&lt;ImportData&gt;<sp/><ref refid="classMaaPiCli_1_1ProjectInterfaceNS_1_1Parser_1af516bf5275f379cc415286b9a567f022" kindref="member">parse_import_data</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>json::value&amp;<sp/>json);</highlight></codeline>
 <codeline lineno="31"><highlight class="normal"></highlight></codeline>
 <codeline lineno="32"><highlight class="normal"></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
-<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>check_task(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structMaaPiCli_1_1ProjectInterfaceNS_1_1InterfaceData" kindref="compound">InterfaceData</ref>&amp;<sp/>data,<sp/><ref refid="structMaaPiCli_1_1ProjectInterfaceNS_1_1Configuration_1_1Task" kindref="compound">Configuration::Task</ref>&amp;<sp/>config_task);</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>check_task(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structMaaPiCli_1_1ProjectInterfaceNS_1_1InterfaceData" kindref="compound">InterfaceData</ref>&amp;<sp/>data,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structMaaPiCli_1_1ProjectInterfaceNS_1_1Configuration" kindref="compound">Configuration</ref>&amp;<sp/>config,<sp/><ref refid="structMaaPiCli_1_1ProjectInterfaceNS_1_1Configuration_1_1Task" kindref="compound">Configuration::Task</ref>&amp;<sp/>config_task,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal">&amp;<sp/>changed);</highlight></codeline>
 <codeline lineno="34"><highlight class="normal">};</highlight></codeline>
 <codeline lineno="35"><highlight class="normal"></highlight></codeline>
 <codeline lineno="36"><highlight class="normal"><ref refid="Conf_8h_1ad36fabf2cb6e023566cc44c41e8f8a3c" kindref="member">MAA_PROJECT_INTERFACE_NS_END</ref></highlight></codeline>

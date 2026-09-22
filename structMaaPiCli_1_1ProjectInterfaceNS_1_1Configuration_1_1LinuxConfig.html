@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.12.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MaaPiCli: MaaPiCli::ProjectInterfaceNS::RuntimeParam::WlRootsParam Struct Reference</title>
+<title>MaaPiCli: MaaPiCli::ProjectInterfaceNS::Configuration::LinuxConfig Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">MaaPiCli<span id="projectnumber">&#160;(main) v5.12.4-beta.3</span>
+   <div id="projectname">MaaPiCli<span id="projectnumber">&#160;(main) v5.13.0-beta</span>
    </div>
    <div id="projectbrief">Command-line ProjectInterface client for MaaFramework</div>
   </td>
@@ -84,15 +84,15 @@ $(function(){ initResizable(false); });
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespaceMaaPiCli.html">MaaPiCli</a></li><li class="navelem"><a class="el" href="namespaceMaaPiCli_1_1ProjectInterfaceNS.html">ProjectInterfaceNS</a></li><li class="navelem"><a class="el" href="structMaaPiCli_1_1ProjectInterfaceNS_1_1RuntimeParam.html">RuntimeParam</a></li><li class="navelem"><a class="el" href="structMaaPiCli_1_1ProjectInterfaceNS_1_1RuntimeParam_1_1WlRootsParam.html">WlRootsParam</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespaceMaaPiCli.html">MaaPiCli</a></li><li class="navelem"><a class="el" href="namespaceMaaPiCli_1_1ProjectInterfaceNS.html">ProjectInterfaceNS</a></li><li class="navelem"><a class="el" href="structMaaPiCli_1_1ProjectInterfaceNS_1_1Configuration.html">Configuration</a></li><li class="navelem"><a class="el" href="structMaaPiCli_1_1ProjectInterfaceNS_1_1Configuration_1_1LinuxConfig.html">LinuxConfig</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div id="doc-content">
 <div class="header">
   <div class="summary">
 <a href="#pub-attribs">Public Attributes</a> &#124;
-<a href="structMaaPiCli_1_1ProjectInterfaceNS_1_1RuntimeParam_1_1WlRootsParam-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">MaaPiCli::ProjectInterfaceNS::RuntimeParam::WlRootsParam Struct Reference</div></div>
+<a href="structMaaPiCli_1_1ProjectInterfaceNS_1_1Configuration_1_1LinuxConfig-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">MaaPiCli::ProjectInterfaceNS::Configuration::LinuxConfig Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
@@ -100,34 +100,66 @@ $(function(){ initResizable(false); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:ae3d4cffe99ab2bb6c38c5d798798dbc4" id="r_ae3d4cffe99ab2bb6c38c5d798798dbc4"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae3d4cffe99ab2bb6c38c5d798798dbc4">wlr_socket_path</a></td></tr>
-<tr class="separator:ae3d4cffe99ab2bb6c38c5d798798dbc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ce1097e2de465e02de9cf3cc0c80e68" id="r_a1ce1097e2de465e02de9cf3cc0c80e68"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1ce1097e2de465e02de9cf3cc0c80e68">use_win32_vk_code</a> = false</td></tr>
-<tr class="separator:a1ce1097e2de465e02de9cf3cc0c80e68"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a35bea10e121367df3b2b932d8aa851b6" id="r_a35bea10e121367df3b2b932d8aa851b6"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a35bea10e121367df3b2b932d8aa851b6">wlr_socket_path</a></td></tr>
+<tr class="separator:a35bea10e121367df3b2b932d8aa851b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c35b727b96b40b28467c43741f71b29" id="r_a3c35b727b96b40b28467c43741f71b29"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3c35b727b96b40b28467c43741f71b29">uinput_screen_width</a> = 0</td></tr>
+<tr class="separator:a3c35b727b96b40b28467c43741f71b29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a561ad10abb736e9095a4dd2d1d51f489" id="r_a561ad10abb736e9095a4dd2d1d51f489"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a561ad10abb736e9095a4dd2d1d51f489">uinput_screen_height</a> = 0</td></tr>
+<tr class="separator:a561ad10abb736e9095a4dd2d1d51f489"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6509ea450207bdd30ed5325663dfa197" id="r_a6509ea450207bdd30ed5325663dfa197"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6509ea450207bdd30ed5325663dfa197">eis_socket_path</a></td></tr>
+<tr class="separator:a6509ea450207bdd30ed5325663dfa197"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="ae3d4cffe99ab2bb6c38c5d798798dbc4" name="ae3d4cffe99ab2bb6c38c5d798798dbc4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae3d4cffe99ab2bb6c38c5d798798dbc4">&#9670;&#160;</a></span>wlr_socket_path</h2>
+<a id="a35bea10e121367df3b2b932d8aa851b6" name="a35bea10e121367df3b2b932d8aa851b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a35bea10e121367df3b2b932d8aa851b6">&#9670;&#160;</a></span>wlr_socket_path</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::string MaaPiCli::ProjectInterfaceNS::RuntimeParam::WlRootsParam::wlr_socket_path</td>
+          <td class="memname">std::string MaaPiCli::ProjectInterfaceNS::Configuration::LinuxConfig::wlr_socket_path</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a1ce1097e2de465e02de9cf3cc0c80e68" name="a1ce1097e2de465e02de9cf3cc0c80e68"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1ce1097e2de465e02de9cf3cc0c80e68">&#9670;&#160;</a></span>use_win32_vk_code</h2>
+<a id="a3c35b727b96b40b28467c43741f71b29" name="a3c35b727b96b40b28467c43741f71b29"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c35b727b96b40b28467c43741f71b29">&#9670;&#160;</a></span>uinput_screen_width</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool MaaPiCli::ProjectInterfaceNS::RuntimeParam::WlRootsParam::use_win32_vk_code = false</td>
+          <td class="memname">int MaaPiCli::ProjectInterfaceNS::Configuration::LinuxConfig::uinput_screen_width = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a561ad10abb736e9095a4dd2d1d51f489" name="a561ad10abb736e9095a4dd2d1d51f489"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a561ad10abb736e9095a4dd2d1d51f489">&#9670;&#160;</a></span>uinput_screen_height</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int MaaPiCli::ProjectInterfaceNS::Configuration::LinuxConfig::uinput_screen_height = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6509ea450207bdd30ed5325663dfa197" name="a6509ea450207bdd30ed5325663dfa197"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6509ea450207bdd30ed5325663dfa197">&#9670;&#160;</a></span>eis_socket_path</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string MaaPiCli::ProjectInterfaceNS::Configuration::LinuxConfig::eis_socket_path</td>
         </tr>
       </table>
 </div><div class="memdoc">
