@@ -2141,7 +2141,7 @@ void Interactor::edit_task()
         return;
     }
 
-    // 把新值写回 config_task.option[oi]
+    // 把新值写回 config_task.option[oi],并且处理好config_task.option中子树顺序
     auto new_iter = std::ranges::find_if(edited_result, [&](const auto& o) { return o.name == edited_name; });
 
     if (new_iter == edited_result.end()) {
@@ -2149,7 +2149,26 @@ void Interactor::edit_task()
         return;
     }
 
-    config_task.option[oi] = *new_iter;
+    // 定位旧子树的范围：[subtree_begin, subtree_end)
+    auto subtree_begin = config_task.option.begin() + static_cast<std::ptrdiff_t>(oi);
+    auto subtree_end = std::next(subtree_begin);
+
+    if (data_task_iter != config_.interface_data().task.end() && !data_task_iter->option.empty()) {
+        const auto& declared_top_options = data_task_iter->option;
+        const auto is_top_level = [&](const std::string& name) {
+            return std::ranges::find(declared_top_options, name) != declared_top_options.end();
+        };
+        while (subtree_end != config_task.option.end() && !is_top_level(subtree_end->name)) {
+            ++subtree_end;
+        }
+    }
+
+    // 用 edited_result替换旧子树
+    config_task.option.erase(subtree_begin, subtree_end);
+    config_task.option.insert(
+        config_task.option.begin() + static_cast<std::ptrdiff_t>(oi),
+        std::make_move_iterator(edited_result.begin()),
+        std::make_move_iterator(edited_result.end()));
 
     std::cout << "Option \"" << MAA_NS::utf8_to_crt(edited_name) << "\" updated.\n\n";
 }
