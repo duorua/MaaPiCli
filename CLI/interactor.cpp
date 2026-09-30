@@ -2040,6 +2040,20 @@ void Interactor::edit_task()
         return value;
     };
 
+    // 子选项
+    auto collect_children = [&](const std::vector<Configuration::Option>& options, const std::string& name) {
+        std::unordered_set<std::string> children;
+        std::vector<const InterfaceData::Option::Case*> selected_cases;
+        if (select_runtime_option_cases(name, options, selected_cases)) {
+            for (const auto* sc : selected_cases) {
+                for (const auto& child : sc->option) {
+                    children.insert(child);
+                }
+            }
+        }
+        return children;
+    };
+
     // 选择任务
     while (true) {
         std::cout << "### Edit task ###\n\n";
@@ -2081,7 +2095,7 @@ void Interactor::edit_task()
             std::cout << MAA_NS::utf8_to_crt(task_desc) << "\n\n";
         }
 
-        // 空 option 的任务：补全一次
+        // 空 option 的任务:补全一次
         if (config_task.option.empty()) {
             if (data_task_iter == config_.interface_data().task.end() || data_task_iter->option.empty()) {
                 std::cout << "This task has no options.\n\n";
@@ -2111,8 +2125,20 @@ void Interactor::edit_task()
         // 选择选项
         while (true) {
             std::cout << "Options:\n\n";
+
+            // 用栈追踪当前遍历路径,计算每个选项的缩进深度
+            std::vector<std::unordered_set<std::string>> level_stack;
+
             for (size_t i = 0; i < config_task.option.size(); ++i) {
                 const auto& opt = config_task.option[i];
+
+                // 弹出不再属于当前路径的层级
+                while (!level_stack.empty() && !level_stack.back().contains(opt.name)) {
+                    level_stack.pop_back();
+                }
+
+                const int depth = static_cast<int>(level_stack.size());
+                const std::string indent(static_cast<size_t>(depth), '-');
 
                 std::string val_str;
                 if (!opt.value.empty()) {
@@ -2146,8 +2172,15 @@ void Interactor::edit_task()
                     val_str = "(empty)";
                 }
 
-                std::cout << MAA_NS::utf8_to_crt(std::format("\t{}. {} = {}\n", i + 1, opt.name, val_str));
+                std::cout << MAA_NS::utf8_to_crt(std::format("{}{}. {} = {}\n", indent, i + 1, opt.name, val_str));
+
+                // 把该选项的子选项集合压栈,供后续选项判断深度
+                auto children = collect_children(config_task.option, opt.name);
+                if (!children.empty()) {
+                    level_stack.push_back(std::move(children));
+                }
             }
+
             std::cout << "\t0. Back to task selection\n\n";
 
             auto opt_line = read_line("Select option: ");
@@ -2188,16 +2221,28 @@ void Interactor::edit_task()
 
             // 定位旧子树范围 [subtree_begin, subtree_end)
             auto subtree_begin = config_task.option.begin() + static_cast<std::ptrdiff_t>(oi);
-            auto subtree_end = std::next(subtree_begin);
+            auto subtree_end = subtree_begin;
 
-            if (data_task_iter != config_.interface_data().task.end() && !data_task_iter->option.empty()) {
-                const auto& declared_top_options = data_task_iter->option;
-                const auto is_top_level = [&](const std::string& name) {
-                    return std::ranges::find(declared_top_options, name) != declared_top_options.end();
-                };
-                while (subtree_end != config_task.option.end() && !is_top_level(subtree_end->name)) {
-                    ++subtree_end;
+            // active_names 保存当前已确认属于子树的选项的直接子选项名
+            std::unordered_set<std::string> active_names;
+            auto collect_child_names = [&](const std::string& name) {
+                std::vector<const InterfaceData::Option::Case*> selected_cases;
+                if (!select_runtime_option_cases(name, config_task.option, selected_cases)) {
+                    return;
                 }
+                for (const auto* sc : selected_cases) {
+                    for (const auto& child : sc->option) {
+                        active_names.insert(child);
+                    }
+                }
+            };
+
+            collect_child_names(edited_name);
+            ++subtree_end;
+
+            while (subtree_end != config_task.option.end() && active_names.contains(subtree_end->name)) {
+                collect_child_names(subtree_end->name);
+                ++subtree_end;
             }
 
             config_task.option.erase(subtree_begin, subtree_end);
