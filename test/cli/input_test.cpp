@@ -91,6 +91,41 @@ int main()
             "an empty multi-selection without an allowed empty selection should retry");
     }
 
+#ifdef _WIN32
+    {
+        const std::string utf8_bytes = "\xE6\xB5\x8B\xE8\xAF\x95";
+        require(code_page_to_utf8(utf8_bytes, 65001) == utf8_bytes, "CP65001 should pass UTF-8 through");
+    }
+    {
+        const std::string gbk_bytes = "\xB2\xE2\xCA\xD4";
+        const std::string expected = "\xE6\xB5\x8B\xE8\xAF\x95";
+        require(code_page_to_utf8(gbk_bytes, 936) == expected, "CP936 GBK should convert to UTF-8");
+    }
+    {
+        const std::string sjis_bytes = "\x83\x65\x83\x58\x83\x67";
+        const std::string expected = "\xE3\x83\x86\xE3\x82\xB9\xE3\x83\x88";
+        require(code_page_to_utf8(sjis_bytes, 932) == expected, "CP932 Shift-JIS should convert to UTF-8");
+    }
+    {
+        const std::string cp949_bytes = "\xC5\xD7\xBD\xBA\xC6\xAE";
+        const std::string expected = "\xED\x85\x8C\xEC\x8A\xA4\xED\x8A\xB8";
+        require(code_page_to_utf8(cp949_bytes, 949) == expected, "CP949 should convert to UTF-8");
+    }
+    {
+        const std::string cp1252_bytes = "\xE9";
+        const std::string expected = "\xC3\xA9";
+        require(code_page_to_utf8(cp1252_bytes, 1252) == expected, "CP1252 should convert to UTF-8");
+    }
+    {
+        require(code_page_to_utf8("", 936).empty(), "empty input should stay empty under CP936");
+        require(code_page_to_utf8("", 65001).empty(), "empty input should stay empty under CP65001");
+    }
+    {
+        const std::string bad = "\xFF";
+        require(code_page_to_utf8(bad, 936) == bad, "invalid bytes should be returned as-is");
+    }
+#endif
+
     if (failures != 0) {
         std::cerr << failures << " input test assertion(s) failed\n";
         return 1;
