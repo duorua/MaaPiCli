@@ -2126,7 +2126,7 @@ void Interactor::edit_task()
         while (true) {
             std::cout << "Options:\n\n";
 
-            // 用栈追踪当前遍历路径,计算每个选项的缩进深度
+            // 栈追踪当前遍历路径,计算每个选项的缩进深度
             std::vector<std::unordered_set<std::string>> level_stack;
 
             for (size_t i = 0; i < config_task.option.size(); ++i) {
@@ -2181,7 +2181,7 @@ void Interactor::edit_task()
                 }
             }
 
-            std::cout << "\t0. Back to task selection\n\n";
+            std::cout << "0. Back to task selection\n\n";
 
             auto opt_line = read_line("Select option: ");
             if (!opt_line) {
@@ -2858,15 +2858,6 @@ bool Interactor::apply_preset()
 
         Configuration::Task config_task;
         config_task.name = preset_task.name;
-
-        if (preset_task.option.empty() && !data_iter->option.empty()) {
-            std::string preset_task_display = get_display_name(data_iter->name, data_iter->label);
-            for (const auto& option_name : data_iter->option) {
-                if (!process_option(option_name, preset_task_display, config_task.option, /*auto_accept_default=*/true)) {
-                    LogWarn << "Failed to process option for preset task" << VAR(preset_task.name) << VAR(option_name);
-                }
-            }
-        }
 
         for (const auto& [opt_name, opt_value] : preset_task.option) {
             auto opt_iter = config_.interface_data().option.find(opt_name);
