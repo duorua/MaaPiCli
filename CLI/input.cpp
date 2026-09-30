@@ -18,7 +18,6 @@ std::string code_page_to_utf8(std::string_view bytes, unsigned int code_page)
     }
 
     const int bytes_size = static_cast<int>(bytes.size());
-
     const int wlen = MultiByteToWideChar(code_page, MB_ERR_INVALID_CHARS, bytes.data(), bytes_size, nullptr, 0);
     if (wlen <= 0) {
         return std::string(bytes);
@@ -28,13 +27,14 @@ std::string code_page_to_utf8(std::string_view bytes, unsigned int code_page)
     MultiByteToWideChar(code_page, MB_ERR_INVALID_CHARS, bytes.data(), bytes_size, wbuf.data(), wlen);
 
     const int wbuf_size = static_cast<int>(wbuf.size());
-    const int u8len = WideCharToMultiByte(CP_UTF8, MB_ERR_INVALID_CHARS, wbuf.data(), wbuf_size, nullptr, 0, nullptr, nullptr);
+
+    const int u8len = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, wbuf.data(), wbuf_size, nullptr, 0, nullptr, nullptr);
     if (u8len <= 0) {
         return std::string(bytes);
     }
 
     std::string result(static_cast<size_t>(u8len), '\0');
-    WideCharToMultiByte(CP_UTF8, MB_ERR_INVALID_CHARS, wbuf.data(), wbuf_size, result.data(), u8len, nullptr, nullptr);
+    WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, wbuf.data(), wbuf_size, result.data(), u8len, nullptr, nullptr);
     return result;
 }
 #endif
