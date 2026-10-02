@@ -11,26 +11,6 @@
 #include "MaaUtils/Platform.h"
 
 #ifdef _WIN32
-namespace
-{
-bool is_roundtrip_lossless(std::wstring_view wide, std::string_view original, unsigned int code_page)
-{
-    const int wsize = static_cast<int>(wide.size());
-    const int backlen = WideCharToMultiByte(code_page, 0, wide.data(), wsize, nullptr, 0, nullptr, nullptr);
-    if (backlen <= 0) {
-        return false;
-    }
-
-    std::string backbuf(static_cast<size_t>(backlen), '\0');
-    const int converted = WideCharToMultiByte(code_page, 0, wide.data(), wsize, backbuf.data(), backlen, nullptr, nullptr);
-    if (converted <= 0) {
-        return false;
-    }
-
-    return backbuf == std::string(original);
-}
-}
-
 std::string code_page_to_utf8(std::string_view bytes, unsigned int code_page)
 {
     if (code_page == CP_UTF8) {
@@ -56,9 +36,11 @@ std::string code_page_to_utf8(std::string_view bytes, unsigned int code_page)
         return std::string(bytes);
     }
 
-    // 用 round-trip 判断有没有触发Windows Best-Fit
-    if (flags == 0 && !is_roundtrip_lossless(wbuf, bytes, code_page)) {
-        return std::string(bytes);
+    if (flags == 0) {
+        const bool best_fit = std::ranges::any_of(wbuf, [](wchar_t c) { return c == 0xFFFD || (c >= 0xE000 && c <= 0xF8FF); });
+        if (best_fit) {
+            return std::string(bytes);
+        }
     }
 
     const int wbuf_size = static_cast<int>(wbuf.size());
