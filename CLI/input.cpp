@@ -11,15 +11,39 @@
 #include "MaaUtils/Platform.h"
 
 #ifdef _WIN32
+namespace
+{
+bool is_roundtrip_lossless(std::wstring_view wide, std::string_view original, unsigned int code_page)
+{
+    const int wsize = static_cast<int>(wide.size());
+    const int backlen = WideCharToMultiByte(code_page, 0, wide.data(), wsize, nullptr, 0, nullptr, nullptr);
+    if (backlen <= 0) {
+        return false;
+    }
+
+    std::string backbuf(static_cast<size_t>(backlen), '\0');
+    const int converted = WideCharToMultiByte(code_page, 0, wide.data(), wsize, backbuf.data(), backlen, nullptr, nullptr);
+    if (converted <= 0) {
+        return false;
+    }
+
+    return backbuf == std::string(original);
+}
+}
+
 std::string code_page_to_utf8(std::string_view bytes, unsigned int code_page)
 {
     if (code_page == CP_UTF8) {
         return std::string(bytes);
     }
 
+    if (bytes.empty()) {
+        return std::string();
+    }
+
     const int bytes_size = static_cast<int>(bytes.size());
 
-    DWORD flags = (code_page == 54936) ? MB_ERR_INVALID_CHARS : 0;
+    const DWORD flags = (code_page == 54936) ? MB_ERR_INVALID_CHARS : 0;
 
     const int wlen = MultiByteToWideChar(code_page, flags, bytes.data(), bytes_size, nullptr, 0);
     if (wlen <= 0) {
@@ -29,6 +53,11 @@ std::string code_page_to_utf8(std::string_view bytes, unsigned int code_page)
     std::wstring wbuf(static_cast<size_t>(wlen), L'\0');
     const int converted = MultiByteToWideChar(code_page, flags, bytes.data(), bytes_size, wbuf.data(), wlen);
     if (converted <= 0) {
+        return std::string(bytes);
+    }
+
+    // 用 round-trip 判断有没有触发Windows Best-Fit
+    if (flags == 0 && !is_roundtrip_lossless(wbuf, bytes, code_page)) {
         return std::string(bytes);
     }
 
@@ -45,6 +74,7 @@ std::string code_page_to_utf8(std::string_view bytes, unsigned int code_page)
     if (converted8 <= 0) {
         return std::string(bytes);
     }
+
     return result;
 }
 #endif
