@@ -3,48 +3,48 @@ name: build
 on:
     push:
         tags:
-            - 'v*'
+            - "v*"
         branches:
-            - 'main'
+            - "main"
         paths:
-            - '.github/workflows/build.yml'
-            - '.github/workflows/meta.yml'
-            - '.github/actions/setup-maafw/**'
-            - 'CLI/**'
-            - 'Impl/**'
-            - 'include/**'
-            - 'maafw-version.txt'
-            - 'test/package/maapicli/**'
-            - 'test/package/smoke.py'
-            - 'test/cli/fixtures/eof/**'
-            - 'cmake/**'
-            - 'CMakeLists.txt'
-            - 'README.md'
-            - 'LICENSE.md'
+            - ".github/workflows/build.yml"
+            - ".github/workflows/meta.yml"
+            - ".github/actions/setup-maafw/**"
+            - "CLI/**"
+            - "Impl/**"
+            - "include/**"
+            - "maafw-version.txt"
+            - "test/package/maapicli/**"
+            - "test/package/smoke.py"
+            - "test/cli/fixtures/eof/**"
+            - "cmake/**"
+            - "CMakeLists.txt"
+            - "README.md"
+            - "LICENSE.md"
     pull_request:
         branches:
-            - '**'
+            - "**"
         paths:
-            - '.github/workflows/build.yml'
-            - '.github/workflows/meta.yml'
-            - '.github/actions/setup-maafw/**'
-            - 'CLI/**'
-            - 'Impl/**'
-            - 'include/**'
-            - 'maafw-version.txt'
-            - 'test/package/maapicli/**'
-            - 'test/package/smoke.py'
-            - 'test/cli/fixtures/eof/**'
-            - 'cmake/**'
-            - 'CMakeLists.txt'
-            - 'README.md'
-            - 'LICENSE.md'
+            - ".github/workflows/build.yml"
+            - ".github/workflows/meta.yml"
+            - ".github/actions/setup-maafw/**"
+            - "CLI/**"
+            - "Impl/**"
+            - "include/**"
+            - "maafw-version.txt"
+            - "test/package/maapicli/**"
+            - "test/package/smoke.py"
+            - "test/cli/fixtures/eof/**"
+            - "cmake/**"
+            - "CMakeLists.txt"
+            - "README.md"
+            - "LICENSE.md"
     workflow_dispatch:
         inputs:
             build-config:
                 description: CMake build configuration
                 required: true
-                default: 'RelWithDebInfo'
+                default: "RelWithDebInfo"
                 type: choice
                 options:
                     - Debug
@@ -53,12 +53,12 @@ on:
             maaframework-repository:
                 description: MaaFramework repository
                 required: true
-                default: 'MaaXYZ/MaaFramework'
+                default: "MaaXYZ/MaaFramework"
                 type: string
             maaframework-version:
                 description: MaaFramework release tag override
                 required: false
-                default: ''
+                default: ""
                 type: string
 
 permissions:
@@ -95,12 +95,12 @@ jobs:
                       platform: ARM64
                       can-run: false
                     - os: linux
-                      runs-on: ubuntu-latest
+                      runs-on: ubuntu-24.04
                       arch: x86_64
                       platform: x86_64
                       can-run: true
                     - os: linux
-                      runs-on: ubuntu-latest
+                      runs-on: ubuntu-24.04
                       arch: aarch64
                       platform: aarch64
                       can-run: false
