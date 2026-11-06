@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['welcome_0',['welcome',['../structMaaPiCli_1_1ProjectInterfaceNS_1_1InterfaceData.html#af3bd6910ed184238f8edfc26f036c3b6',1,'MaaPiCli::ProjectInterfaceNS::InterfaceData']]],
+  ['welcome_0',['welcome',['../structMaaPiCli_1_1ProjectInterfaceNS_1_1InterfaceData.html#aaf4865a7414d37ea4d705757e2e809ab',1,'MaaPiCli::ProjectInterfaceNS::InterfaceData']]],
   ['win32_1',['win32',['../structMaaPiCli_1_1ProjectInterfaceNS_1_1InterfaceData_1_1Controller.html#ad796ae54b515aa4f38bed2357cfef21f',1,'MaaPiCli::ProjectInterfaceNS::InterfaceData::Controller::win32'],['../structMaaPiCli_1_1ProjectInterfaceNS_1_1Configuration.html#abbf0671843031bef2e41b393bcb7502b',1,'MaaPiCli::ProjectInterfaceNS::Configuration::win32']]],
   ['window_5fid_2',['window_id',['../structMaaPiCli_1_1ProjectInterfaceNS_1_1Configuration_1_1MacOSConfig.html#ac3aa50c4883e527f07515f5508b90245',1,'MaaPiCli::ProjectInterfaceNS::Configuration::MacOSConfig::window_id'],['../structMaaPiCli_1_1ProjectInterfaceNS_1_1RuntimeParam_1_1MacOSParam.html#a33a57d3e2bd5342c9d3cc280f267dd75',1,'MaaPiCli::ProjectInterfaceNS::RuntimeParam::MacOSParam::window_id']]],
   ['window_5fname_3',['window_name',['../structMaaPiCli_1_1ProjectInterfaceNS_1_1Configuration_1_1Win32Config.html#a252e467a3828086125ca59939996122c',1,'MaaPiCli::ProjectInterfaceNS::Configuration::Win32Config::window_name'],['../structMaaPiCli_1_1ProjectInterfaceNS_1_1Configuration_1_1GamepadConfig.html#a529d0ce4feb8d4c5c7bcc60937ae2dbf',1,'MaaPiCli::ProjectInterfaceNS::Configuration::GamepadConfig::window_name']]],
