@@ -8,7 +8,7 @@ public:
     explicit Interactor(std::filesystem::path user_path);
 
     bool load(const std::filesystem::path& resource_path);
-    void print_config() const;
+    void print_config();
     bool interact();
     bool run();
 
@@ -23,7 +23,8 @@ private:
 
     bool interact_for_first_time_use();
 
-    void welcome() const;
+    void welcome();
+    bool show_welcome_if_changed();
     ActionStatus interact_once();
     ActionStatus action_status(bool completed) const;
 
@@ -48,6 +49,7 @@ private:
     void edit_task();
     bool delete_task();
     bool move_task();
+    std::vector<const MAA_PROJECT_INTERFACE_NS::InterfaceData::Preset*> applicable_presets() const;
     bool apply_preset();
 
     bool process_level_options(

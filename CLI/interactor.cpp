@@ -130,7 +130,7 @@ namespace
 constexpr DWORD kMaxPathBuffer = 32768;
 
 // ShellExecuteW return value threshold: values > 32 indicate success, <= 32 indicate error codes.
-// See: https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shellexecutew
+// See: https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shellexecutew
 constexpr intptr_t kShellExecuteSuccessThreshold = 32;
 
 bool is_running_as_admin()
@@ -199,7 +199,7 @@ bool restart_self_as_admin()
 } // namespace
 
 Interactor::Interactor(std::filesystem::path user_path)
-    : user_path_(std::move(user_path))
+    : user_path_(std::filesystem::absolute(user_path))
 {
     LogDebug << VAR(user_path_);
 }
@@ -335,7 +335,7 @@ bool Interactor::run()
     return ret;
 }
 
-void Interactor::print_config() const
+void Interactor::print_config()
 {
     using namespace MAA_PROJECT_INTERFACE_NS;
 
@@ -495,7 +495,7 @@ bool Interactor::interact_for_first_time_use()
     return true;
 }
 
-void Interactor::welcome() const
+void Interactor::welcome()
 {
     using namespace MAA_PROJECT_INTERFACE_NS;
 
@@ -516,11 +516,7 @@ void Interactor::welcome() const
         }
     }
 
-    // 显示欢迎信息
-    if (!data.welcome.empty()) {
-        std::string welcome_text = read_text_content(data.welcome);
-        std::cout << MAA_NS::utf8_to_crt(welcome_text) << "\n\n";
-    }
+    show_welcome_if_changed();
 
     // 显示项目描述
     if (!data.description.empty()) {
@@ -546,9 +542,38 @@ void Interactor::welcome() const
     }
 }
 
+bool Interactor::show_welcome_if_changed()
+{
+    using namespace MAA_PROJECT_INTERFACE_NS;
+
+    const auto declared_welcome = Parser::welcome_items(config_.interface_data().welcome);
+    std::vector<std::string> resolved_welcome;
+    resolved_welcome.reserve(declared_welcome.size());
+    for (const auto& item : declared_welcome) {
+        resolved_welcome.emplace_back(read_text_content(item));
+    }
+
+    const auto changed = config_.update_welcome_snapshots(user_path_, std::move(declared_welcome), std::move(resolved_welcome));
+    if (!changed.has_value()) {
+        LogError << "Failed to save welcome snapshots";
+        std::cout << "\nFailed to save welcome announcements.\n\n";
+        return false;
+    }
+    if (!*changed) {
+        return false;
+    }
+
+    auto& config = config_.configuration();
+    for (const auto& welcome_text : config.last_resolved_welcome) {
+        std::cout << MAA_NS::utf8_to_crt(welcome_text) << "\n\n";
+    }
+
+    return true;
+}
+
 Interactor::ActionStatus Interactor::interact_once()
 {
-    bool has_presets = !config_.interface_data().preset.empty();
+    const bool has_presets = !applicable_presets().empty();
 
     std::cout << "### Select action ###\n\n";
     std::cout << "\t1. Switch controller\n";
@@ -1856,6 +1881,12 @@ bool Interactor::process_option(
                 std::string input_desc = read_text_content(input_def.description);
                 std::cout << MAA_NS::utf8_to_crt(input_desc) << "\n";
             }
+            if (input_def.input_type == InterfaceData::Option::Input::InputType::File) {
+                input_display_name += " (file path)";
+            }
+            else if (input_def.input_type == InterfaceData::Option::Input::InputType::Directory) {
+                input_display_name += " (directory path)";
+            }
             std::cout << MAA_NS::utf8_to_crt(std::format("{} [{}]: ", input_display_name, input_def.password ? "********" : default_val));
 
             auto read_input_value = [&]() -> std::optional<std::string> {
@@ -2766,11 +2797,15 @@ bool Interactor::ensure_pretask_options()
             && std::ranges::find(data_pretask.controller, current_controller) == data_pretask.controller.end()) {
             continue;
         }
+        const std::string identifier = data_pretask.name.empty() ? data_pretask.exec : data_pretask.name;
+        if (config_.configuration().enabled_pretask
+            && std::ranges::find(*config_.configuration().enabled_pretask, identifier) == config_.configuration().enabled_pretask->end()) {
+            continue;
+        }
         if (data_pretask.option.empty()) {
             continue;
         }
 
-        const std::string identifier = data_pretask.name.empty() ? data_pretask.exec : data_pretask.name;
         const std::string display_name = get_display_name(identifier, data_pretask.label);
         auto& config_pretasks = config_.configuration().pretask;
         auto config_pretask_iter =
@@ -2815,11 +2850,23 @@ bool Interactor::mpause()
     return true;
 }
 
+std::vector<const MAA_PROJECT_INTERFACE_NS::InterfaceData::Preset*> Interactor::applicable_presets() const
+{
+    std::vector<const MAA_PROJECT_INTERFACE_NS::InterfaceData::Preset*> presets;
+    const auto& controller = config_.configuration().controller.name;
+    for (const auto& preset : config_.interface_data().preset) {
+        if (preset.controller.empty() || std::ranges::find(preset.controller, controller) != preset.controller.end()) {
+            presets.emplace_back(&preset);
+        }
+    }
+    return presets;
+}
+
 bool Interactor::apply_preset()
 {
     using namespace MAA_PROJECT_INTERFACE_NS;
 
-    const auto& presets = config_.interface_data().preset;
+    const auto presets = applicable_presets();
     if (presets.empty()) {
         std::cout << "No presets available.\n\n";
         return false;
@@ -2827,7 +2874,7 @@ bool Interactor::apply_preset()
 
     std::cout << "### Apply preset ###\n\n";
     for (size_t i = 0; i < presets.size(); ++i) {
-        const auto& p = presets[i];
+        const auto& p = *presets[i];
         std::string display_name = get_display_name(p.name, p.label);
         std::cout << MAA_NS::utf8_to_crt(std::format("\t{}. {}\n", i + 1, display_name));
         if (!p.description.empty()) {
@@ -2842,7 +2889,139 @@ bool Interactor::apply_preset()
         input_aborted_ = true;
         return false;
     }
-    const auto& preset = presets.at(static_cast<size_t>(*selected - 1));
+    const auto& preset = *presets.at(static_cast<size_t>(*selected - 1));
+
+    std::optional<std::vector<std::string>> preset_enabled_pretasks;
+    std::vector<Configuration::Pretask> preset_pretask_config;
+    if (preset.pretask) {
+        const auto declared_pretasks = Parser::flatten_pretask(config_.interface_data().pretask);
+        preset_enabled_pretasks.emplace();
+        std::unordered_set<std::string> seen_pretasks;
+        for (const auto& preset_pretask : *preset.pretask) {
+            if (!seen_pretasks.emplace(preset_pretask.name).second) {
+                LogError << "Duplicate pretask in preset" << VAR(preset_pretask.name);
+                std::cout << "Failed to apply preset: duplicate pretask \"" << MAA_NS::utf8_to_crt(preset_pretask.name) << "\".\n\n";
+                return false;
+            }
+            auto declared = std::ranges::find_if(declared_pretasks, [&](const auto& item) {
+                return (item.name.empty() ? item.exec : item.name) == preset_pretask.name;
+            });
+            if (declared == declared_pretasks.end()) {
+                LogError << "Preset references unknown pretask" << VAR(preset_pretask.name);
+                std::cout << "Failed to apply preset: unknown pretask \"" << MAA_NS::utf8_to_crt(preset_pretask.name) << "\".\n\n";
+                return false;
+            }
+            if ((!declared->resource.empty()
+                 && std::ranges::find(declared->resource, config_.configuration().resource) == declared->resource.end())
+                || (!declared->controller.empty()
+                    && std::ranges::find(declared->controller, config_.configuration().controller.name) == declared->controller.end())) {
+                continue;
+            }
+            if (!preset_pretask.enabled) {
+                continue;
+            }
+
+            Configuration::Pretask item;
+            item.name = preset_pretask.name;
+            for (const auto& [option_name, option_value] : preset_pretask.option) {
+                auto definition = config_.interface_data().option.find(option_name);
+                if (definition == config_.interface_data().option.end()) {
+                    LogError << "Preset pretask references unknown option" << VAR(preset_pretask.name) << VAR(option_name);
+                    std::cout << "Failed to apply preset: unknown option \"" << MAA_NS::utf8_to_crt(option_name) << "\".\n\n";
+                    return false;
+                }
+                const auto& data_option = definition->second;
+                if ((!data_option.resource.empty()
+                     && std::ranges::find(data_option.resource, config_.configuration().resource) == data_option.resource.end())
+                    || (!data_option.controller.empty()
+                        && std::ranges::find(data_option.controller, config_.configuration().controller.name)
+                               == data_option.controller.end())) {
+                    LogError << "Preset pretask references inapplicable option" << VAR(preset_pretask.name) << VAR(option_name);
+                    std::cout << "Failed to apply preset: option \"" << MAA_NS::utf8_to_crt(option_name)
+                              << "\" is unavailable for the selected resource or controller.\n\n";
+                    return false;
+                }
+                Configuration::Option option;
+                option.name = option_name;
+                switch (definition->second.type) {
+                case InterfaceData::Option::Type::Select:
+                case InterfaceData::Option::Type::Switch:
+                    if (!option_value.is_string()
+                        || std::ranges::none_of(data_option.cases, [&](const auto& c) { return c.name == option_value.as_string(); })) {
+                        LogError << "Invalid preset option value" << VAR(preset_pretask.name) << VAR(option_name);
+                        std::cout << "Failed to apply preset: invalid value for option \"" << MAA_NS::utf8_to_crt(option_name) << "\".\n\n";
+                        return false;
+                    }
+                    option.value = option_value.as_string();
+                    break;
+                case InterfaceData::Option::Type::Checkbox:
+                    if (!option_value.is_array()) {
+                        LogError << "Invalid preset checkbox value" << VAR(preset_pretask.name) << VAR(option_name);
+                        return false;
+                    }
+                    {
+                        std::unordered_set<std::string> selected_values;
+                        for (const auto& value : option_value.as_array()) {
+                            if (!value.is_string()
+                                || std::ranges::none_of(data_option.cases, [&](const auto& c) { return c.name == value.as_string(); })) {
+                                LogError << "Invalid preset checkbox case" << VAR(preset_pretask.name) << VAR(option_name);
+                                return false;
+                            }
+                            if (!selected_values.emplace(value.as_string()).second) {
+                                LogError << "Duplicate preset checkbox case" << VAR(preset_pretask.name) << VAR(option_name);
+                                return false;
+                            }
+                            option.values.emplace_back(value.as_string());
+                        }
+                        if ((data_option.min_count && option.values.size() < *data_option.min_count)
+                            || (data_option.max_count && option.values.size() > *data_option.max_count)) {
+                            LogError << "Invalid preset checkbox count" << VAR(preset_pretask.name) << VAR(option_name);
+                            return false;
+                        }
+                    }
+                    break;
+                case InterfaceData::Option::Type::Input:
+                    if (!option_value.is_object()) {
+                        LogError << "Invalid preset input value" << VAR(preset_pretask.name) << VAR(option_name);
+                        return false;
+                    }
+                    for (const auto& [key, value] : option_value.as_object()) {
+                        auto input = std::ranges::find(data_option.inputs, key, &InterfaceData::Option::Input::name);
+                        if (input == data_option.inputs.end() || input->password || !value.is_string()) {
+                            LogError << "Invalid or secret preset input" << VAR(preset_pretask.name) << VAR(option_name) << VAR(key);
+                            return false;
+                        }
+                        if (!input->verify.empty()) {
+                            if (auto pattern = MAA_NS::regex_valid(MAA_NS::to_u16(input->verify))) {
+                                if (!boost::regex_match(MAA_NS::to_u16(value.as_string()), *pattern)) {
+                                    LogError << "Preset input does not match its validation pattern" << VAR(preset_pretask.name)
+                                             << VAR(option_name) << VAR(key);
+                                    return false;
+                                }
+                            }
+                        }
+                        option.inputs.emplace(key, value.as_string());
+                    }
+                    break;
+                }
+                item.option.emplace_back(std::move(option));
+            }
+
+            if (!ensure_declared_option_tree(declared->option, get_display_name(item.name, declared->label), item.option, true)) {
+                return false;
+            }
+            for (const auto& [option_name, _] : preset_pretask.option) {
+                if (std::ranges::none_of(item.option, [&](const auto& option) { return option.name == option_name; })) {
+                    LogError << "Preset pretask option is inactive or unavailable" << VAR(preset_pretask.name) << VAR(option_name);
+                    std::cout << "Failed to apply preset: option \"" << MAA_NS::utf8_to_crt(option_name)
+                              << "\" is inactive or unavailable.\n\n";
+                    return false;
+                }
+            }
+            preset_enabled_pretasks->emplace_back(item.name);
+            preset_pretask_config.emplace_back(std::move(item));
+        }
+    }
 
     std::vector<Configuration::Task> preset_tasks;
     for (const auto& preset_task : preset.task) {
@@ -2917,9 +3096,17 @@ bool Interactor::apply_preset()
     Configuration preset_config;
     preset_config.resource = config_.configuration().resource;
     preset_config.controller = config_.configuration().controller;
+    preset_config.pretask = preset.pretask ? std::move(preset_pretask_config) : config_.configuration().pretask;
+    preset_config.enabled_pretask = preset.pretask ? std::move(preset_enabled_pretasks) : config_.configuration().enabled_pretask;
     preset_config.task = std::move(preset_tasks);
-    Parser::check_configuration(config_.interface_data(), preset_config);
+    if (!Parser::check_configuration(config_.interface_data(), preset_config)) {
+        LogError << "Preset configuration failed validation" << VAR(preset.name);
+        std::cout << "Failed to apply preset: its configuration is invalid. Existing configuration is unchanged.\n\n";
+        return false;
+    }
 
+    config_.configuration().pretask = std::move(preset_config.pretask);
+    config_.configuration().enabled_pretask = std::move(preset_config.enabled_pretask);
     config_.configuration().task = std::move(preset_config.task);
     std::string preset_display = get_display_name(preset.name, preset.label);
     std::cout << "Applied preset: " << MAA_NS::utf8_to_crt(preset_display) << "\n\n";
